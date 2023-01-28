@@ -12,7 +12,7 @@ module.exports = {
         const command = client.commands.get(interaction.commandName);
         if(!command)
         return interaction.reply({
-            content: 'This command is outdated.',
+            content: 'This command is outdated or currently not in use.',
             ephemeral: true
         });
 
@@ -21,7 +21,15 @@ module.exports = {
             content: 'This command is only available to the developer.',
             ephemeral: true
         });
-        
-        command.execute(interaction, client);
+
+        const subCommand = interaction.options.getSubcommand(false);
+        if (subCommand) {
+            const subCommandFile = client.subCommands.get(`${interaction.commandName}.${subCommand}`);
+            if (!subCommandFile) return interaction.reply({
+                content: 'This sub command is outdated.',
+                ephemeral: true
+            });
+            subCommandFile.execute(interaction, client);
+        } else command.execute(interaction, client);
     }
 }
